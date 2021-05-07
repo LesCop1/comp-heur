@@ -1,0 +1,61 @@
+PROCEDURE checkSyntax(data)
+    lines <- SEPARER PAR \n data
+    POUR line DANS lines FAIRE
+        SI line NE RESPECT PAS regex ALORS
+            RENVOIE FAUX
+        FIN SI
+    FIN POUR
+
+    RENVOIE VRAI
+FIN
+
+
+PROCEDURE importSeatsData(data)
+    SI checkSyntax(data) ALORS
+        arr <- []
+        lines <- SEPARER PAR \n data
+
+        POUR line DANS lines FAIRE
+            lineData <- line SEPARER PAR ; line
+            newSeat <- {
+                name <- lineData[0]
+                x <- lineData[1]
+                y <- lineData[2]
+            }
+            newSeat AJOUTER A arr
+        FIN POUR
+
+        RENVOIE arr
+    FIN SI
+
+    RENVOIE []
+FIN
+
+
+PROCEDURE isInRange(a, b, d)
+    RENVOIE RACINE_CARRE(PUISSANCE(a.x - b.x, 2) + PUISSANCE(a.y - b.y, 2)) < d
+FIN
+
+
+PROCEDURE VERIFY(seats, takenSeats, distance)
+    POUR i ALLANT DE 0 A TAILLE(takenSeats) - 1 FAIRE
+        POUR j ALLANT DE i + 1 A TAILLE(takenSeats) FAIRE
+            SI isInRange(seats[takenSeats[i]], seats[takenSeats[j]], distance) ALORS
+                RENVOIE FAUX
+            FIN SI
+        FIN POUR
+    FIN POUR
+
+    RENVOIE VRAI
+FIN
+
+
+PROCEDURE main(dataString, takenSeat, distance)
+    formattedString <- importSeatsData(dataString)
+    timeStart <- TEMPS_MAINTENANT
+    result <- verify(formattedString, takenSeat, distance)
+    RENVOIE {
+        time <- TEMPS_MAINTENANT - timeStart
+        result <- result
+    }
+FIN
