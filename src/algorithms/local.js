@@ -2,65 +2,6 @@ import { realGreedy } from "./greedy";
 import { isInRange, isSeatAvailable } from "./helpers";
 import { SEAT_DEFAULT_COLOR, SEAT_OBSTRUCTED_COLOR, SEAT_TAKEN_COLOR } from "../globals";
 
-export function local(seatsData, distance, maxIteration, maxTime) {
-  const timeStart = Date.now();
-  realLocal(seatsData, distance, maxIteration, maxTime);
-  const time = Date.now() - timeStart;
-
-  let arrowSteps = [];
-  let colorSteps = [];
-  let colorKey;
-
-  let seatsTaken = realGreedy(seatsData, distance);
-
-  arrowSteps.push(null);
-  colorKey = [...Array(seatsData.length).keys()].map((_, i) =>
-    seatsTaken.includes(i) ? SEAT_TAKEN_COLOR : SEAT_DEFAULT_COLOR
-  );
-  colorSteps.push(colorKey.slice());
-
-  let iteration = 0;
-  let startTime = Date.now();
-  while (iteration <= maxIteration && Date.now() - startTime <= maxTime) {
-    const indexToDelete = Math.floor(Math.random() * seatsTaken.length);
-    const newPlaceTaken = [...Array(seatsData.length).keys()].filter((val) => !seatsTaken.includes(val))[
-      Math.floor(Math.random() * (seatsData.length - seatsTaken.length))
-    ];
-
-    const newSeatsTaken = swap(
-      seatsData,
-      seatsTaken,
-      distance,
-      indexToDelete,
-      newPlaceTaken,
-      arrowSteps,
-      colorSteps,
-      colorKey
-    );
-    arrowSteps.push(null);
-    colorKey = [...Array(seatsData.length).keys()].map((_, i) =>
-      newSeatsTaken.includes(i) ? SEAT_TAKEN_COLOR : SEAT_DEFAULT_COLOR
-    );
-    colorSteps.push(colorKey.slice());
-
-    if (newSeatsTaken.length > seatsTaken.length) {
-      seatsTaken = newSeatsTaken;
-    } else {
-      arrowSteps.push(null);
-      colorKey = [...Array(seatsData.length).keys()].map((_, i) =>
-        seatsTaken.includes(i) ? SEAT_TAKEN_COLOR : SEAT_DEFAULT_COLOR
-      );
-      colorSteps.push(colorKey.slice());
-    }
-
-    iteration++;
-  }
-  arrowSteps.push(null);
-  colorSteps.push(colorKey.slice());
-
-  return [arrowSteps, colorSteps, time, null];
-}
-
 function swap(seatsData, seatsTaken, distance, index, newPlaceTaken, arrowSteps, colorSteps, colorKey) {
   const newSeatsTaken = [...seatsTaken];
 
@@ -124,9 +65,22 @@ function swap(seatsData, seatsTaken, distance, index, newPlaceTaken, arrowSteps,
   return newSeatsTaken.sort();
 }
 
-function realLocal(seatsData, distance, maxIteration, maxTime) {
+export function local(seatsData, distance, maxIteration, maxTime) {
+  const timeStart = Date.now();
+  realLocal(seatsData, distance, maxIteration, maxTime);
+  const time = Date.now() - timeStart;
+
+  let arrowSteps = [];
+  let colorSteps = [];
+  let colorKey;
+
   let seatsTaken = realGreedy(seatsData, distance);
-  console.log("Start w/ " + seatsTaken.length);
+
+  arrowSteps.push(null);
+  colorKey = [...Array(seatsData.length).keys()].map((_, i) =>
+    seatsTaken.includes(i) ? SEAT_TAKEN_COLOR : SEAT_DEFAULT_COLOR
+  );
+  colorSteps.push(colorKey.slice());
 
   let iteration = 0;
   let startTime = Date.now();
@@ -136,14 +90,38 @@ function realLocal(seatsData, distance, maxIteration, maxTime) {
       Math.floor(Math.random() * (seatsData.length - seatsTaken.length))
     ];
 
-    const newSeatsTaken = realSwap(seatsData, seatsTaken, distance, indexToDelete, newPlaceTaken);
-    if (newSeatsTaken.length > seatsTaken.length) seatsTaken = newSeatsTaken;
+    const newSeatsTaken = swap(
+      seatsData,
+      seatsTaken,
+      distance,
+      indexToDelete,
+      newPlaceTaken,
+      arrowSteps,
+      colorSteps,
+      colorKey
+    );
+    arrowSteps.push(null);
+    colorKey = [...Array(seatsData.length).keys()].map((_, i) =>
+      newSeatsTaken.includes(i) ? SEAT_TAKEN_COLOR : SEAT_DEFAULT_COLOR
+    );
+    colorSteps.push(colorKey.slice());
+
+    if (newSeatsTaken.length > seatsTaken.length) {
+      seatsTaken = newSeatsTaken;
+    } else {
+      arrowSteps.push(null);
+      colorKey = [...Array(seatsData.length).keys()].map((_, i) =>
+        seatsTaken.includes(i) ? SEAT_TAKEN_COLOR : SEAT_DEFAULT_COLOR
+      );
+      colorSteps.push(colorKey.slice());
+    }
 
     iteration++;
   }
-  console.log("final = " + seatsTaken.length);
+  arrowSteps.push(null);
+  colorSteps.push(colorKey.slice());
 
-  return seatsTaken;
+  return [arrowSteps, colorSteps, time, null];
 }
 
 function realSwap(seatsData, seatsTaken, distance, index, newPlaceTaken) {
@@ -166,4 +144,24 @@ function realSwap(seatsData, seatsTaken, distance, index, newPlaceTaken) {
   }
 
   return newSeatsTaken.sort();
+}
+
+function realLocal(seatsData, distance, maxIteration, maxTime) {
+  let seatsTaken = realGreedy(seatsData, distance);
+
+  let iteration = 0;
+  let startTime = Date.now();
+  while (iteration <= maxIteration && Date.now() - startTime <= maxTime) {
+    const indexToDelete = Math.floor(Math.random() * seatsTaken.length);
+    const newPlaceTaken = [...Array(seatsData.length).keys()].filter((val) => !seatsTaken.includes(val))[
+      Math.floor(Math.random() * (seatsData.length - seatsTaken.length))
+    ];
+
+    const newSeatsTaken = realSwap(seatsData, seatsTaken, distance, indexToDelete, newPlaceTaken);
+    if (newSeatsTaken.length > seatsTaken.length) seatsTaken = newSeatsTaken;
+
+    iteration++;
+  }
+
+  return seatsTaken;
 }

@@ -1,0 +1,127 @@
+PROCEDURE checkSyntax(data)
+    lines <- SEPARER PAR \n data
+    POUR line DANS lines FAIRE
+        SI line NE RESPECT PAS regex ALORS
+            RENVOIE FAUX
+        FIN SI
+    FIN POUR
+
+    RENVOIE VRAI
+FIN
+
+
+PROCEDURE importSeatsData(data)
+    SI checkSyntax(data) ALORS
+        arr <- []
+        lines <- SEPARER PAR \n data
+
+        POUR line DANS lines FAIRE
+            lineData <- line SEPARER PAR ; line
+            newSeat <- {
+                name <- lineData[0]
+                x <- lineData[1]
+                y <- lineData[2]
+            }
+            newSeat AJOUTER A arr
+        FIN POUR
+
+        RENVOIE arr
+    FIN SI
+
+    RENVOIE []
+FIN
+
+
+PROCEDURE isInRange(a, b, d)
+    RENVOIE RACINE_CARRE(PUISSANCE(a.x - b.x, 2) + PUISSANCE(a.y - b.y, 2)) < d
+FIN
+
+
+PROCEDURE isSeatAvailable(seatsData, i, takenSeats, distance)
+    POUR CHAQUE takenSeat DANS takenSeats FAIRE
+        SI isInRange(seatsData[i], seatsData[takenSeat], distance)
+            RENVOIE FAUX
+        FIN SI
+    FIN POUR
+
+    RENVOIE VRAI
+FIN
+
+
+PROCEDURE greedy(seats, distance)
+    seatsTaken <- []
+    POUR i ALLANT DE 0 A TAILLE(seats) FAIRE
+        noSeatsTakenInRange <- VRAI
+
+        POUR j DANS seatsTaken FAIRE
+            SI isInRange(seats[i], seats[j], distance) ALORS
+                noSeatsInRange <- FAUX
+                SORTIR POUR
+            FIN SI
+        FIN POUR
+
+        SI noSeatsTakenInRange ALORS
+            i AJOUTER A seatsTaken
+        FIN SI
+    FIN POUR
+
+    RENVOIE seatsTaken
+FIN
+
+
+PROCEDURE swap(seatsData, seatsTaken, distance, index, newPlaceTaken)
+    newSeatsTaken <- seatsTaken
+
+    ENLEVER(newSeatsTaken, 0, 1)
+    AJOUTER(newSeatsTaken, newPlaceTaken)
+
+    POUR i ALLANT DE TAILLE(newSeatsTaken) FAIRE
+        SI isInRange(seatsData[newSeatsTaken[i]], seatsData[newSeatsTaken[TAILLE(newSeatsTaken) - 1]], distance) ALORS
+            ENLEVER(newSeatsTaken, i, 1)
+            i <- i - 1
+        FIN SI
+    FIN POUR
+
+    POUR i ALLANT DE TAILLE(seatsData) FAIRE
+        SI isSeatAvailable(seatsData, i, newSeatsTaken, distance) ALORS
+            AJOUTER(newSeatsTaken, i)
+        FIN SI
+    FIN POUR
+
+    RENVOIE TRIE(newSeatsTaken)
+FIN
+
+
+PROCEDURE local(seatsData, distance, maxIteration, maxTime)
+    seatsTaken <- greedy(seatsData, distance)
+
+    iteration <- 0
+    startTime <-TEMPS_MAINTENANT
+
+    TANT QUE (iteration <= maxIteration) && (TEMPS_MAINTENANT - startTime <= maxTime)
+        indexToDelete <- PARTIE_ENTIERE(ALEATOIRE_0_1 * TAILLE(seatsTaken))
+        newPlaceTaken <- TABLEAU(TAILLE(seatsData)).REMPLIR(CLE_TABLEAU()).FILTRER((val) -> !INCLUE(seatsTaken, val))
+                                    [PARTIE_ENTIERE(ALEATOIRE_0_1 * (TAILLE(seatsData) - TAILLE(seatsTaken))]
+
+        newSeatsTaken <- swap(seatsData, seatsTaken, distance, indexToDelete, newPlaceTaken)
+        SI TAILLE(newSeatsTaken) > TAILLE(seatsTaken) ALORS
+            seatsTaken <- newSeatsTaken
+        FIN SI
+
+        iteration <- iteration + 1
+    FIN TANT QUE
+
+    RENVOIE seatsTaken
+FIN
+
+
+PROCEDURE main(dataString, distance)
+    formattedString <- importSeatsData(dataString)
+    timeStart <- TEMPS_MAINTENANT
+    result <- local(formattedString, distance, 2000, 500)
+    RENVOIE {
+        time <- TEMPS_MAINTENANT - timeStart
+        result <- result
+        numberOfOccupiedSeats <- TAILLE(result)
+    }
+FIN

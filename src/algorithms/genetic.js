@@ -130,7 +130,7 @@ export function genetic(seatsData, distance, maxTries, populationSize, generatio
 
       const rng = Math.random();
       if (rng > 0.75) {
-        population[i].splice(Math.floor(Math.random() * (population.length - 1)), 1);
+        population[i].splice(Math.floor(Math.random() * (population[i].length - 1)), 1);
 
         colorKey = [...Array(seatsData.length).keys()].map((_, index) =>
           population[i].includes(index) ? SEAT_TAKEN_COLOR : SEAT_DEFAULT_COLOR
@@ -138,7 +138,7 @@ export function genetic(seatsData, distance, maxTries, populationSize, generatio
         arrowSteps.push(null);
         colorSteps.push(colorKey.slice());
         if (rng > 0.975) {
-          population[i].splice(Math.floor(Math.random() * (population.length - 1)), 1);
+          population[i].splice(Math.floor(Math.random() * (population[i].length - 1)), 1);
 
           colorKey = [...Array(seatsData.length).keys()].map((_, index) =>
             population[i].includes(index) ? SEAT_TAKEN_COLOR : SEAT_DEFAULT_COLOR
@@ -257,12 +257,12 @@ function realGenetic(seatsData, distance, maxTries, populationSize, generationMa
       population[i] = commonPlacesOfParents.slice(0, Math.floor((commonPlacesOfParents.length - 1) * 0.75));
 
       // Mutating
-      population[i].splice(Math.floor(Math.random() * (population.length - 1)), 1);
+      population[i].splice(Math.floor(Math.random() * (population[i].length - 1)), 1);
       const rng = Math.random();
       if (rng > 0.75) {
-        population[i].splice(Math.floor(Math.random() * (population.length - 1)), 1);
+        population[i].splice(Math.floor(Math.random() * (population[i].length - 1)), 1);
         if (rng > 0.975) {
-          population[i].splice(Math.floor(Math.random() * (population.length - 1)), 1);
+          population[i].splice(Math.floor(Math.random() * (population[i].length - 1)), 1);
         }
       }
 

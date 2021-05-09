@@ -342,7 +342,7 @@ export default function App() {
       case "greedy":
         result = greedy(seatsData, distance * 100);
         break;
-      case "verify":
+      case "verification":
         result = verify(seatsData, seatsColor, distance * 100);
         break;
       case "local":
@@ -410,7 +410,7 @@ export default function App() {
   };
 
   const seatOnClick = (index) => {
-    if (algorithm === "verify") {
+    if (algorithm === "verification") {
       const newColor = [...seatsColor];
       newColor[index] = cycleThroughAssignableColors(newColor[index]);
       setSeatsColor(newColor);
@@ -447,7 +447,7 @@ export default function App() {
               textColor="secondary"
               onChange={(event, newValue) => changeAlgorithm(newValue)}>
               <Tab value={"greedy"} label="Greedy" />
-              <Tab value={"verify"} label="Verification" />
+              <Tab value={"verification"} label="Verification" />
               <Tab value={"local"} label="Local" />
               <Tab value={"genetic"} label="Genetic" />
             </Tabs>
@@ -474,7 +474,7 @@ export default function App() {
               </TabButton>
               <TabButton
                 value={algorithm}
-                index={"verify"}
+                index={"verification"}
                 variant={"contained"}
                 color={"secondary"}
                 disabled={seatsData.length <= 0 || seatsColor.some((val) => val === SEAT_OBSTRUCTED_COLOR)}

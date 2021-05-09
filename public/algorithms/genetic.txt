@@ -1,0 +1,163 @@
+PROCEDURE checkSyntax(data)
+    lines <- SEPARER PAR \n data
+    POUR line DANS lines FAIRE
+        SI line NE RESPECT PAS regex ALORS
+            RENVOIE FAUX
+        FIN SI
+    FIN POUR
+
+    RENVOIE VRAI
+FIN
+
+
+PROCEDURE importSeatsData(data)
+    SI checkSyntax(data) ALORS
+        arr <- []
+        lines <- SEPARER PAR \n data
+
+        POUR line DANS lines FAIRE
+            lineData <- line SEPARER PAR ; line
+            newSeat <- {
+                name <- lineData[0]
+                x <- lineData[1]
+                y <- lineData[2]
+            }
+            newSeat AJOUTER A arr
+        FIN POUR
+
+        RENVOIE arr
+    FIN SI
+
+    RENVOIE []
+FIN
+
+
+PROCEDURE isInRange(a, b, d)
+    RENVOIE RACINE_CARRE(PUISSANCE(a.x - b.x, 2) + PUISSANCE(a.y - b.y, 2)) < d
+FIN
+
+
+PROCEDURE shuffleArray(array)
+    POUR i ALLANT DE <- TAILLE(array) - 1 A 0 FAIRE
+        j <- PARTIE_ENTIERE(ALEATOIRE_0_1 * (i + 1))
+        [array[i], array[j]] <- [array[j], array[i]]
+    FIN POUR
+
+    RENVOIE array
+FIN
+
+
+PROCEDURE genetic(seatsData, distance, maxTries, populationSize, generationMax)
+    generation <- 0
+    population <- []
+
+    bestTwo <- [NULL, NULL]
+
+    POUR i ALLANT DE 0 A populationSize FAIRE
+        freePlaces <- TABLEAU(TAILLE(seatsData)).REMPLIR(CLE_TABLEAU())
+        shuffleArray(freePlaces)
+        takenPlace <- [freePlaces[0]]
+        ENLEVER(freePlaces, 0, 1)
+
+        tries <- 0
+        TANT QUE (tries < maxTries) || (TAILLE(takenPlace) < 3) FAIRE
+            shuffleArray(freePlaces)
+            randomPlace <- freePlace[0]
+
+            inRange <- FAUX
+            POUR j ALLANT DE 0 a TAILLE(takenPlace) FAIRE
+                SI isInRange(seatsData[randomPlace], seatsData[takenPlace[j]], distance) ALORS
+                    inRange <- VRAI
+                    FIN POUR
+                FIN SI
+            FIN POUR
+
+            SI inRange ALORS
+                AJOUTER(takenPlace, randomPlace)
+                ENLEVER(freePlaces, 0, 1)
+            SINON
+                tries <- tries + 1
+            FIN SI
+        FIN TANT QUE
+
+        population[i] <- takenPlace
+    FIN POUR
+
+    TANT QUE generation < generationMax FAIRE
+        POUR i ALLANT DE 0 A populationSize FAIRE
+            POUR j ALLANT DE 0 A 2 FAIRE
+                SI !bestTwo[j] || TAILLE(population[i]) > TAILLE(bestTwo[j]) ALORS
+                    bestTwo[j] <- population[i]
+                    FIN POUR
+                FIN SI
+            FIN POUR
+        FIN POUR
+
+        commonPlacesOfParents <- TABLEAU(TAILLE(seatsData)).REMPLIR(CLE_TABLEAU())
+                                    .FILTER((val) => INCLUE(bestTwo[0], val) && INCLUE(bestTwo[1], val))
+
+        POUR i ALLANT DE 0 A populationSize FAIRE
+            shuffleArray(commonPlacesOfParents)
+            population[i] <- PRENDRE(commonPlacesOfParents, 0, PARTIE_ENTIERE((TAILLE(commonPlacesOfParents) - 1) * 0.75))
+
+            ENLEVER(population[i], PARTIE_ENTIERE(ALEATOIRE_0_1() * (TAILLE(population[i]) - 1)), 1)
+            rng <- ALEATOIRE_0_1()
+            SI rng > 0.75 ALORS
+                ENLEVER(population[i], PARTIE_ENTIERE(ALEATOIRE_0_1() * (TAILLE(population[i]) - 1)), 1)
+                SI rng > 0.975 ALORS
+                    ENLEVER(population[i], PARTIE_ENTIERE(ALEATOIRE_0_1() * (TAILLE(population[i]) - 1)), 1)
+                FIN SI
+            FIN SI
+
+            firstCompute <- VRAI
+            freePlaces <- []
+            potentialFreeTakenPlaces <- []
+
+            TANT QUE TAILLE(potentialFreeTakenPlaces) > 0 || firstCompute FAIRE
+                SI firstCompute ALORS
+                    firstCompute <- FAUX
+                SINON
+                    AJOUTER(population[i], potentialFreeTakenPlaces[0])
+                FIN SI
+
+                freePlaces <- TABLEAU(TAILLE(seatsData)).REMPLIR(CLE_TABLEAU())
+                                        .FILTER((val) => !INCLUE(population[i], val))
+
+                potentialFreeTakenPlaces <- []
+
+                POUR j ALLANT DE 0 A TAILLE(freePlaces) FAIRE
+                    inRange <- FAUX
+
+                    POUR k ALLANT DE 0 A TAILLE(population[i]) FAIRE
+                        SI isInRange(seatsData[j], seatsData[population[i][k]], distance) ALORS
+                            inRange <- VRAI
+                            FIN POUR
+                        FIN SI
+                    FIN POUR
+
+                    SI !inRange ALORS
+                        AJOUTER(potentialFreeTakenPlaces, j)
+                    FIN SI
+                FIN POUR
+                shuffleArray(potentialFreeTakenPlaces)
+
+            FIN TANT QUE
+        FIN POUR
+
+        generation <- generation + 1
+    FIN TANT QUE
+
+    RENVOIE bestTwo[0]
+FIN
+
+
+PROCEDURE main(dataString, distance)
+    formattedString <- importSeatsData(dataString)
+    timeStart <- TEMPS_MAINTENANT
+    result <- genetic(formattedString, distance, 3, 200, 10)
+    RENVOIE {
+        time <- TEMPS_MAINTENANT - timeStart
+        result <- result
+        numberOfOccupiedSeats <- TAILLE(result)
+    }
+FIN
