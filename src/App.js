@@ -485,7 +485,11 @@ export default function App() {
                 index={"verification"}
                 variant={"contained"}
                 color={"secondary"}
-                disabled={seatsData.length <= 0 || seatsColor.some((val) => val === SEAT_OBSTRUCTED_COLOR)}
+                disabled={
+                  seatsData.length <= 0 ||
+                  seatsColor.some((val) => val === SEAT_OBSTRUCTED_COLOR) ||
+                  !seatsColor.includes(SEAT_TAKEN_COLOR)
+                }
                 onClick={() => onClickVerification()}
                 className={classes.menuButton}>
                 {running ? "End" : "Verify"}
