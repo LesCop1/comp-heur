@@ -223,8 +223,8 @@ export default function App() {
   useEffect(() => {
     if (seatsData.length > 0) {
       setRunning(false);
-      clearTimeout();
-      if (algorithm !== "verify") {
+      clearTimeouts();
+      if (algorithm !== "verification") {
         generateSteps();
       }
     }
@@ -250,7 +250,7 @@ export default function App() {
       .then((txt) => setCodeData({ ...codeData, text: txt }));
   }, [codeData.language, algorithm]);
   useEffect(() => {
-    if (algorithm === "verify" && running === true) {
+    if (algorithm === "verification" && running === true) {
       setNextTimeout();
     }
   }, [running]);
@@ -379,10 +379,18 @@ export default function App() {
     }
   };
   const onClickVerification = () => {
-    generateSteps();
-    clearTimeouts();
-    setRunning(true);
-    setCurrentStep(0);
+    if (!running) {
+      generateSteps();
+      clearTimeouts();
+      setRunning(true);
+      setCurrentStep(0);
+    } else {
+      stopSteps();
+      let newColors = Array(seatsData.length - colorSteps[colorSteps.length - 1].length).fill(SEAT_DEFAULT_COLOR);
+      newColors = [...colorSteps[colorSteps.length - 1], ...newColors];
+
+      setSeatsColor(newColors);
+    }
   };
   const onClickLocal = () => {
     if (!running) {
@@ -480,7 +488,7 @@ export default function App() {
                 disabled={seatsData.length <= 0 || seatsColor.some((val) => val === SEAT_OBSTRUCTED_COLOR)}
                 onClick={() => onClickVerification()}
                 className={classes.menuButton}>
-                Verify
+                {running ? "End" : "Verify"}
               </TabButton>
               <TabButton
                 value={algorithm}
