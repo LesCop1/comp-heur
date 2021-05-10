@@ -459,7 +459,7 @@ export default function App() {
               <Tab value={"local"} label="Local" />
               <Tab value={"genetic"} label="Genetic" />
             </Tabs>
-            <Button variant={"contained"} color={"secondary"} href={process.env.PUBLIC_URL + "/myfile.pdf"}>
+            <Button variant={"contained"} color={"secondary"} href={process.env.PUBLIC_URL + "/CR.pdf"}>
               Download CR
             </Button>
             <Typography variant="h6" className={classes.appBarTitle}>

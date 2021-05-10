@@ -6,7 +6,7 @@ MSAP Solver is a web app built using React made to visualize different way to so
 - local
 - genetic
 
-This app is deployed using Vercel and you can check it out here:
+This app is deployed using Vercel and you can check it out here: [https://msap-solver.vercel.app](https://msap-solver.vercel.app)
 
 There is also a demo available on YouTube here:
 
@@ -37,4 +37,4 @@ To run the web app, simply type:
 npm start
 ```
 
-And you will be able to access the web app on [localhost](http://localhost:3000) on port **3000**.
+And you will be able to access the web app on [localhost](http://localhost:3000) on port **3000** or [here, online](https://msap-solver.vercel.app).
