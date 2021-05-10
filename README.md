@@ -8,7 +8,7 @@ MSAP Solver is a web app built using React made to visualize different way to so
 
 This app is deployed using Vercel and you can check it out here: [https://msap-solver.vercel.app](https://msap-solver.vercel.app)
 
-There is also a demo available on YouTube here:
+There is also a demo available on YouTube here: [https://youtu.be/8CIrKoFDFac](https://youtu.be/8CIrKoFDFac)
 
 ## Prerequisites
 
