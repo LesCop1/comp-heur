@@ -38,3 +38,5 @@ npm start
 ```
 
 And you will be able to access the web app on [localhost](http://localhost:3000) on port **3000** or [here, online](https://msap-solver.vercel.app).
+
+If you experience bugs, please use Google Chrome.
